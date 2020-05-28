@@ -1,5 +1,5 @@
 .vscode/
-Code/
+code/
 code.zip
-Report/*
-!Report/*.pdf
+report/*
+!report/*.pdf
