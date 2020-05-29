@@ -66,7 +66,6 @@ getInputFromFile(void * dummy);
 static inline void *
 getInputFromUser(void * dummy);
 
-
 /*
 *   @params void - no input required
 *   @returns void - data will be stored in outputBuffer
@@ -93,7 +92,7 @@ display(void);
 
 //* ### GLOBAL VARIABLE
 /// Path for the input
-std::string INPUT = "../data/newtonCentral_in.txt";
+std::string INPUT = "../data/newtonDifference_in.txt";
 
 /// Path for the output
 std::string OUTPUT = "../data/newtonCentral_out.txt";
