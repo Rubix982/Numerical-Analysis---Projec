@@ -35,6 +35,7 @@
 #include <thread>
 #include <ctime>
 #include <sstream>
+#include <pthread.h>
 
 //* ### TYPDEFs
 typedef unsigned long long ull;
@@ -82,6 +83,13 @@ calculateDividedDifferences(void);
 static inline void
 throwOutput(void);
 
+/*
+*   @params void - no input required
+*   @returns void - data will be stored in outputBuffer
+*           which is a global variable
+*/
+static inline void
+display(void);
 
 //* ### GLOBAL VARIABLE
 /// Path for the input
@@ -105,9 +113,6 @@ ld ** F = nullptr;
 /// Contains the values for which Y was calculated
 ld * X = nullptr;
 
-/// Contains the values which uesd X to calculate results, since y = f(x)
-ld * Y = nullptr;
-
 /// Final result forumlated as output
 ld Pn_X = 0.0f;
 
@@ -117,17 +122,26 @@ ld X_input = 0.0f;
 int main(int argc, char const *argv[])
 {
 
+    // Get the correct format for the input
     getInput();
+
+    // Calculate the values for F
     calculateDividedDifferences();
+
+    // Use this to see if the values are correct for F
+    // display();
+
+    // Send output to respective output file
     throwOutput();
 
     // # Delete all the heap allocated memory
     for ( ull i = 0; i < numOfInputs ; ++i )
+    {
         delete[] F[i];
+    }
 
     delete[] F;
     delete[] X;
-    delete[] Y;
 
     return 0;
 }
@@ -151,24 +165,27 @@ getInput(void)
 static inline void *
 getInputFromFile(void * dummy)
 {
-    std::cout << "[NEWTRON_CENTRAL] Taking input from respective input"
-                    "file first ... ";
+    std::cout << "[NEWTRON_CENTRAL_INPUT_FILE] Taking input from respective input"
+                    "file first ... \n";
 
     std::ifstream __Infile(INPUT);
-    std::string __tempBuffer;
-    std::string __delimiter = " ";
+    std::string __tempBuffer("");
+    std::string __delimiter(" ");
 
     while ( std::getline(__Infile, __tempBuffer) )
         numOfInputs++;
 
+    // std::cout << numOfInputs << "\n";
+
     F = new ld*[numOfInputs]{nullptr};
     X = new ld[numOfInputs];
-    Y = new ld[numOfInputs];
     for ( ull i = 0 ; i < numOfInputs ; ++i )
         F[i] = new ld[numOfInputs]{0.0f};
 
-    __Infile.seekg(std::ios::beg);
+    __Infile.close();
+    __Infile.open(INPUT);
 
+    // Get the datd and extract the values from them
     for ( ull x = 0, y = 0; std::getline(__Infile, __tempBuffer) ; ++x, ++y )
     {
 
@@ -185,11 +202,12 @@ getInputFromFile(void * dummy)
         // Remove the token that was extracted
         __tempBuffer.erase(0, __delimiter.length() + token.length());
 
-        // # FOR Y
-        // Store the current string as a ld in Y array
-        Y[y] = std::stod(__tempBuffer);
+        // # FOR F(X)
+        // Store the current string as a ld in the 1st column of F
+        F[y][0] = std::stod(__tempBuffer);
     }
 
+    __Infile.close();
     return nullptr;
 }
 
@@ -197,12 +215,12 @@ static inline void *
 getInputFromUser(void * dummy)
 {
 
-    std::cout << "[NEWTON_CENTRAL_INPUT] Taking input from user for "
-            "the values of \'x\' ... ";
+    std::cout << "[NEWTON_CENTRAL_INPUT_USER] Taking input from user for "
+            "the values of \'x\' ... \n";
 
     std::cin >> X_input;
 
-    std::cout << "[NEWTON_CENTRAL_INPUT] Input from user received"
+    std::cout << "[NEWTON_CENTRAL_INPUT_USER] Input from user received"
         " as " << X_input << "\n";
 
     return nullptr;
@@ -214,7 +232,7 @@ calculateDividedDifferences(void)
 
     /// Calculate the respective values of F
     for ( ull i = 1 ; i < numOfInputs ; ++i )
-        for ( ull j = 1; j < i ; ++j )
+        for ( ull j = 1; j <= i ; j++ )
             F[i][j] = (F[i][j-1] - F[i-1][j-1]) / (X[i] - X[i-j]);
 
     /// For Pn(X), Pn_X
@@ -225,16 +243,48 @@ calculateDividedDifferences(void)
     for ( ull i = 1 ; i < numOfInputs ; ++i )
     {
         // First calculate for pi_capital(j=0,i-1){x-xj};
-        ld calculatedProduct = 0.0f;
-        for ( ull j = 0; j < i - 1; ++j )
+        ld calculatedProduct = 1.0f;
+        for ( ull j = 0; j < i ; ++j )
         {
-            continue;
+            calculatedProduct *= ( X_input - X[j] );
+            // std::cout << ( X_input - X[j] ) << " " << calculatedProduct << "\n";
         }
+
+        // Calculating for sigma(i=1,n){F(i,j)*pi_capital(j=0,i-1){x-xj}}
+        sumAndProductResult += (F[i][i] * calculatedProduct);
+        // std::cout << F[i][i] << " " << calculatedProduct << " " <<
+        //     sumAndProductResult << " " << X_input << "\n";
     }
+
+    Pn_X = F[0][0] + sumAndProductResult;
+
+    return ;
 }
 
 static inline void
 throwOutput(void)
 {
+    std::cout << "[NEWTRON_CENTRAL_OUTPUT] Throwing output to the  respective output"
+                    " file ... ";
 
+    std::ofstream __Outfile(OUTPUT);
+    __Outfile << "Thus, Pn(X) = " << Pn_X << "\n";
+    __Outfile.close();
+
+    return ;
+}
+
+static inline void
+display(void)
+{
+    for ( ull i = 0 ; i < numOfInputs ; ++i )
+    {
+        for ( ull j = 0 ; j < numOfInputs ; ++j )
+            std::cout << F[i][j] << " ";
+        std::cout << "\n";
+    }
+
+    std::cout << "Pn(X) := " << Pn_X << "\n";
+
+    return ;
 }
