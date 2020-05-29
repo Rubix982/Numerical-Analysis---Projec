@@ -71,8 +71,8 @@ calculateForwardDifferences(void);
 *   @returns ull - final result
 *
 */
-static inline ull
-Choose(ull n, ull k);
+static inline ld
+Choose(ld n, ull k);
 
 /*
 *   @params ull n - n is any positive number
@@ -133,7 +133,7 @@ int main(int argc, char const *argv[])
     getInput();
 
     calculateForwardDifferences();
-    display();
+    // display();
 
     throwOutput();
 
@@ -261,25 +261,27 @@ calculateForwardDifferences(void)
     */
 
     // Thus
-    ull s = ull(ceil(( X_input - X[0] ) / ( X[1] - X[0] )));
-    // std::cout << s << " " << (( X_input - X[0] ) / ( X[1] - X[0] ))  << "\n";
+    ld s = ( X_input - X[0] ) / ( X[1] - X[0] );
+    std::cout << s << "\n";
 
     ld sumResult = 0.0f;
     for ( ull k = 1 ; k < numOfInputs ; ++k )
     {
-        ull temp = Choose(s, k);
-        std::cout << temp << " " << F[k][k] << "\n";
+        ld temp = 1.0f;
+        for ( ull i = 1 ; i < k ; ++i )
+            temp *= ( s - i + 1);
+        temp /= factorial(k);
         sumResult += (temp * F[k][k]);
     }
 
     Pn_X = F[0][0] + sumResult;
 }
 
-static inline ull
-Choose(ull n, ull k)
+static inline ld
+Choose(ld n, ull k)
 {
-    if ( k == 0 or n == 0 or k == n )/* base case */
-        return 1u;
+    if ( k == 0 or n <= 1E-1   )/* base case */
+        return 1.0f;
     else                            /* recursive case */
         return Choose(n-1, k-1) +   /* take */
                 Choose(n-1, k);     /* not take */
