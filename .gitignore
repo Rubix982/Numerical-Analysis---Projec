@@ -3,4 +3,5 @@ code/
 code.zip
 report/*
 !report/*.pdf
+!report/Report.tex
 build/
