@@ -5,6 +5,5 @@ set(CMAKE_CXX_COMPILER "/usr/bin/g++")
 
 add_compile_options(-O2 -Wall -Wextra)
 add_link_options(-lpthread)
-# add_link_options(-lmath)
 
-add_executable(NC src/newtonForward.cpp)
+add_executable(NC src/newtonBackward.cpp)
