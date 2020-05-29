@@ -1,1 +1,4 @@
-Thus, Pn(X) = 0.51182
+Overall time taken to collect input := 0.000487
+Overall time taken to perform calculation := 2e-06
+Number of iterations := 1200
+Overall time taken to put output in file := 0.000163

@@ -1,1 +1,3 @@
-Thus, Pn(X) = 0.620374
+Overall time taken to collect input := 0.000537
+Overall time taken to perform calculation := 2.4e-05
+Overall time taken to put output in file := 0.000166

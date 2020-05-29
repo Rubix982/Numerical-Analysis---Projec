@@ -130,12 +130,45 @@ ld X_input = 0.0f;
 int main(int argc, char const *argv[])
 {
 
-    getInput();
+    std::ofstream mainOutFile(OUTPUT);
 
+    // Get the correct format for the input
+
+    clock_t start = clock();
+    getInput();
+    clock_t end = clock();
+    double inputTimeUsed = ((double) (end-start)) / CLOCKS_PER_SEC;
+    mainOutFile << "Overall time taken to collect input := " << inputTimeUsed << "\n";
+
+    // Calculate the values for F
+    start = clock();
     calculateForwardDifferences();
+    end = clock();
+    double calculationTimeUsed = ((double) (end-start)) / CLOCKS_PER_SEC;
+    mainOutFile << "Overall time taken to perform calculation := " << calculationTimeUsed << "\n";
+
+    // Use this to see if the values are correct for F
     // display();
 
+    // Send output to respective output file
+    start = clock();
     throwOutput();
+    end = clock();
+    double outputTimeUsed = ((double) (end-start)) / CLOCKS_PER_SEC;
+    mainOutFile << "Overall time taken to put output in file := " << outputTimeUsed << "\n";
+    mainOutFile << "Number of iterations := "
+        << 2 * ( numOfInputs * factorial(numOfInputs) ) << "\n" ;
+
+    mainOutFile.close();
+
+    // # Delete all the heap allocated memory
+    for ( ull i = 0; i < numOfInputs ; ++i )
+    {
+        delete[] F[i];
+    }
+
+    delete[] F;
+    delete[] X;
 
     return 0;
 }
@@ -262,7 +295,6 @@ calculateForwardDifferences(void)
 
     // Thus
     ld s = ( X_input - X[0] ) / ( X[1] - X[0] );
-    std::cout << s << "\n";
 
     ld sumResult = 0.0f;
     for ( ull k = 1 ; k < numOfInputs ; ++k )

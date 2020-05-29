@@ -34,8 +34,10 @@
 #include <functional>
 #include <thread>
 #include <ctime>
+#include <time.h>
 #include <sstream>
 #include <pthread.h>
+#include <cmath>
 
 //* ### TYPDEFs
 typedef unsigned long long ull;
@@ -73,6 +75,15 @@ getInputFromUser(void * dummy);
 */
 static inline void
 calculateDividedDifferences(void);
+
+/*
+*   @params ull n - n is any positive number
+*           Large positive values may produce overflow
+*   @returns ull - final result
+*
+*/
+static inline ull
+factorial(ull n);
 
 /*
 *   @params void - no input required
@@ -121,17 +132,36 @@ ld X_input = 0.0f;
 int main(int argc, char const *argv[])
 {
 
+    std::ofstream mainOutFile(OUTPUT);
+
     // Get the correct format for the input
+
+    clock_t start = clock();
     getInput();
+    clock_t end = clock();
+    double inputTimeUsed = ((double) (end-start)) / CLOCKS_PER_SEC;
+    mainOutFile << "Overall time taken to collect input := " << inputTimeUsed << "\n";
 
     // Calculate the values for F
+    start = clock();
     calculateDividedDifferences();
+    end = clock();
+    double calculationTimeUsed = ((double) (end-start)) / CLOCKS_PER_SEC;
+    mainOutFile << "Overall time taken to perform calculation := " << calculationTimeUsed << "\n";
+    mainOutFile << "Number of iterations := "
+        << 2 * ( numOfInputs * factorial(numOfInputs) ) << "\n" ;
 
     // Use this to see if the values are correct for F
     // display();
 
     // Send output to respective output file
+    start = clock();
     throwOutput();
+    end = clock();
+    double outputTimeUsed = ((double) (end-start)) / CLOCKS_PER_SEC;
+    mainOutFile << "Overall time taken to put output in file := " << outputTimeUsed << "\n";
+
+    mainOutFile.close();
 
     // # Delete all the heap allocated memory
     for ( ull i = 0; i < numOfInputs ; ++i )
@@ -258,6 +288,13 @@ calculateDividedDifferences(void)
     Pn_X = F[0][0] + sumAndProductResult;
 
     return ;
+}
+
+static inline ull
+factorial(ull n)
+{
+    if (n <= 1) return 1;                   /* base case */
+    else        return n*factorial(n-1);    /* recursive case */
 }
 
 static inline void
